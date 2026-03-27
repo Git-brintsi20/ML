@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ML Journey — Growth Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #0f0f18;
+    --bg3: #141420;
+    --surface: #1a1a28;
+    --surface2: #20202f;
+    --border: #2a2a3f;
+    --border2: #353550;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --dim: #3d3d5c;
+    --accent: #7c6af7;
+    --accent2: #a08cf7;
+    --accent-glow: rgba(124, 106, 247, 0.15);
+    --green: #4ade98;
+    --green-dim: rgba(74, 222, 152, 0.12);
+    --amber: #f59e0b;
+    --amber-dim: rgba(245, 158, 11, 0.12);
+    --red: #f87171;
+    --red-dim: rgba(248, 113, 113, 0.1);
+    --blue: #60a5fa;
+    --blue-dim: rgba(96, 165, 250, 0.1);
+    --coral: #fb7185;
+    --teal: #2dd4bf;
+    --mono: 'Space Mono', monospace;
+    --display: 'Syne', sans-serif;
+    --body: 'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--body);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 260px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo .logo-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    margin-bottom: 6px;
+  }
+  .sidebar-logo h1 {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  .sidebar-logo h1 span { color: var(--accent2); }
+
+  .sidebar-stats {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+  }
+  .stat-pill {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    text-align: center;
+  }
+  .stat-pill .num {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent2);
+    display: block;
+  }
+  .stat-pill .lbl {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .sidebar-nav { padding: 12px 0; flex: 1; }
+  .nav-section-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--dim);
+    padding: 8px 20px 4px;
+    text-transform: uppercase;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .nav-item:hover { color: var(--text); background: var(--surface); border-left-color: var(--border2); }
+  .nav-item.active { color: var(--text); background: var(--accent-glow); border-left-color: var(--accent); }
+  .nav-item .nav-icon { font-size: 14px; width: 18px; text-align: center; }
+  .nav-item .nav-badge {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    background: var(--accent-glow);
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+
+  .sidebar-profile {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--teal));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .profile-info { flex: 1; min-width: 0; }
+  .profile-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+  .profile-role {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Main content */
+  .main {
+    margin-left: 260px;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(10, 10, 15, 0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .topbar-title {
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+  }
+  .topbar-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+
+  .content { padding: 32px; max-width: 1100px; }
+
+  /* Section headers */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .section-header h2 {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .section-header .sh-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  /* Overall progress bar */
+  .overall-progress {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .overall-progress::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 200px; height: 100%;
+    background: radial-gradient(circle at 80% 50%, var(--accent-glow), transparent 70%);
+    pointer-events: none;
+  }
+  .op-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .op-label { font-family: var(--display); font-size: 15px; font-weight: 700; }
+  .op-pct { font-family: var(--mono); font-size: 24px; font-weight: 700; color: var(--accent2); }
+  .progress-track {
+    background: var(--bg3);
+    border-radius: 100px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--teal));
+    border-radius: 100px;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+  }
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 40px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25));
+  }
+  .level-dots {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .level-dot {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    background: var(--bg3);
+    transition: all 0.2s;
+  }
+  .level-dot.done { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .level-dot.current { background: var(--accent-glow); border-color: var(--accent); color: var(--accent2); }
+
+  /* Level cards (Striver-style table rows) */
+  .level-block {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .level-block:hover { border-color: var(--border2); }
+  .level-block.done-block { border-color: rgba(74, 222, 152, 0.2); }
+
+  .level-title-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    cursor: pointer;
+    background: var(--surface);
+    border-bottom: 1px solid transparent;
+    transition: background 0.15s;
+    user-select: none;
+  }
+  .level-title-row:hover { background: var(--surface2); }
+  .level-title-row.open { border-bottom-color: var(--border); }
+
+  .level-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    width: 28px;
+    flex-shrink: 0;
+  }
+  .level-badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .badge-ml { background: rgba(124,106,247,0.15); color: #a08cf7; border: 1px solid rgba(124,106,247,0.3); }
+  .badge-dl { background: rgba(45, 212, 191, 0.1); color: var(--teal); border: 1px solid rgba(45,212,191,0.3); }
+  .badge-genai { background: rgba(245,158,11,0.1); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+  .badge-agentic { background: rgba(248,113,113,0.1); color: var(--coral); border: 1px solid rgba(248,113,113,0.25); }
+
+  .level-name {
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 700;
+    flex: 1;
+  }
+  .level-sub-name {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+  .level-prog {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .level-prog-text {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .mini-bar {
+    width: 80px;
+    height: 4px;
+    background: var(--bg3);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .mini-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--teal));
+    border-radius: 100px;
+    transition: width 0.5s ease;
+  }
+  .chevron-icon {
+    color: var(--dim);
+    font-size: 12px;
+    transition: transform 0.2s;
+  }
+  .chevron-icon.open { transform: rotate(90deg); }
+
+  /* Level body: three columns */
+  .level-body { display: none; }
+  .level-body.open { display: block; }
+
+  .task-table { width: 100%; border-collapse: collapse; }
+  .task-table th {
+    padding: 10px 20px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--dim);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+    white-space: nowrap;
+  }
+  .task-table td {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    font-size: 13px;
+  }
+  .task-table tr:last-child td { border-bottom: none; }
+  .task-table tr:hover td { background: rgba(124,106,247,0.03); }
+  .task-table tr.done-row td { opacity: 0.6; }
+
+  .task-type {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .type-yt { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+  .type-build { background: rgba(74,222,152,0.1); color: var(--green); border: 1px solid rgba(74,222,152,0.25); }
+  .type-read { background: rgba(124,106,247,0.12); color: var(--accent2); border: 1px solid rgba(124,106,247,0.25); }
+  .type-concept { background: rgba(245,158,11,0.1); color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
+
+  .task-domain {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  /* Checkbox */
+  .task-check {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border2);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    background: transparent;
+  }
+  .task-check:hover { border-color: var(--accent); background: var(--accent-glow); }
+  .task-check.checked {
+    background: var(--green-dim);
+    border-color: var(--green);
+  }
+  .task-check.checked::after {
+    content: '✓';
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  /* Notes inline */
+  .note-cell {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 0;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding: 10px 18px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+    background: none;
+    border-top: none; border-left: none; border-right: none;
+    margin-bottom: -1px;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Growth profile / journal */
+  .journal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .add-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent2);
+    background: var(--accent-glow);
+    border: 1px solid rgba(124,106,247,0.3);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .add-btn:hover { background: rgba(124,106,247,0.25); }
+
+  .entry-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+    position: relative;
+  }
+  .entry-card:hover { border-color: var(--border2); }
+  .entry-card .entry-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .entry-date {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    white-space: nowrap;
+    padding-top: 2px;
+  }
+  .entry-title {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+    line-height: 1.3;
+  }
+  .entry-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+  .entry-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .entry-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+  .entry-del {
+    position: absolute;
+    top: 14px; right: 14px;
+    font-size: 12px;
+    color: var(--dim);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px;
+    transition: color 0.15s;
+  }
+  .entry-del:hover { color: var(--red); }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 16px;
+    padding: 28px;
+    width: 520px;
+    max-width: 90vw;
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.2s;
+  }
+  .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+  .modal h3 {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 20px;
+  }
+  .modal label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+  .modal label:first-of-type { margin-top: 0; }
+  .modal input, .modal textarea, .modal select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .modal input:focus, .modal textarea:focus, .modal select:focus {
+    border-color: var(--accent);
+  }
+  .modal textarea { min-height: 90px; resize: vertical; }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: flex-end;
+  }
+  .btn-cancel {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    padding: 9px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-cancel:hover { color: var(--text); }
+  .btn-save {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    background: var(--accent);
+    border: none;
+    padding: 9px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-save:hover { background: var(--accent2); }
+
+  /* Platforms section */
+  .platform-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .platform-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .platform-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .platform-card .pc-icon { font-size: 22px; margin-bottom: 8px; }
+  .platform-card .pc-name {
+    font-family: var(--display);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .platform-card .pc-role {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* Habit tracker */
+  .habit-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .habit-row:last-child { border-bottom: none; }
+  .habit-name { font-size: 13px; flex: 1; }
+  .habit-streak {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--amber);
+  }
+  .habit-dots { display: flex; gap: 4px; }
+  .habit-dot {
+    width: 14px; height: 14px;
+    border-radius: 3px;
+    border: 1px solid var(--border2);
+    background: var(--bg3);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .habit-dot.hit { background: var(--green); border-color: var(--green); }
+  .habit-dot:hover { border-color: var(--green); }
+
+  /* Profile edit */
+  .profile-edit-section {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 28px;
+  }
+  .profile-avatar-large {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--teal));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    cursor: pointer;
+    position: relative;
+  }
+  .profile-form { flex: 1; }
+  .profile-field { margin-bottom: 14px; }
+  .profile-field label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .profile-field input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .profile-field input:focus { border-color: var(--accent); }
+
+  .save-profile-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    background: var(--accent);
+    border: none;
+    padding: 9px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .save-profile-btn:hover { background: var(--accent2); }
+
+  /* empty state */
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--muted);
+  }
+  .empty-state .es-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.5; }
+  .empty-state p { font-size: 13px; line-height: 1.6; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .content { padding: 20px 16px; }
+    .topbar { padding: 14px 16px; }
+    .task-table th:nth-child(4),
+    .task-table td:nth-child(4) { display: none; }
+  }
+
+  /* Page fade-in */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .content > * {
+    animation: fadeUp 0.4s ease both;
+  }
+  .level-block:nth-child(1) { animation-delay: 0.05s; }
+  .level-block:nth-child(2) { animation-delay: 0.1s; }
+  .level-block:nth-child(3) { animation-delay: 0.15s; }
+  .level-block:nth-child(4) { animation-delay: 0.2s; }
+  .level-block:nth-child(5) { animation-delay: 0.25s; }
+  .level-block:nth-child(6) { animation-delay: 0.3s; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-tag">// ML JOURNEY</div>
+    <h1>Growth<br/><span>Sheet</span></h1>
+  </div>
+
+  <div class="sidebar-stats">
+    <div class="stat-pill">
+      <span class="num" id="sb-done">0</span>
+      <span class="lbl">DONE</span>
+    </div>
+    <div class="stat-pill">
+      <span class="num" id="sb-total">0</span>
+      <span class="lbl">TASKS</span>
+    </div>
+    <div class="stat-pill">
+      <span class="num" id="sb-pct">0%</span>
+      <span class="lbl">COMPLETE</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Sections</div>
+    <a class="nav-item active" onclick="showTab('roadmap', this)">
+      <span class="nav-icon">🗺</span> Roadmap
+    </a>
+    <a class="nav-item" onclick="showTab('growth', this)">
+      <span class="nav-icon">📓</span> Growth Log
+    </a>
+    <a class="nav-item" onclick="showTab('habits', this)">
+      <span class="nav-icon">🔥</span> Habits
+    </a>
+    <a class="nav-item" onclick="showTab('platforms', this)">
+      <span class="nav-icon">🔗</span> Platforms
+    </a>
+    <a class="nav-item" onclick="showTab('profile', this)">
+      <span class="nav-icon">👤</span> Profile
+    </a>
+
+    <div class="nav-section-label" style="margin-top:8px">Levels</div>
+    <a class="nav-item" onclick="showTab('roadmap',document.querySelector('.nav-item'));jumpToLevel(0)">
+      <span class="nav-icon">01</span>
+      <span>ML Foundations</span>
+      <span class="nav-badge" id="nb-0">–</span>
+    </a>
+    <a class="nav-item" onclick="showTab('roadmap',document.querySelector('.nav-item'));jumpToLevel(1)">
+      <span class="nav-icon">02</span>
+      <span>Core Algorithms</span>
+      <span class="nav-badge" id="nb-1">–</span>
+    </a>
+    <a class="nav-item" onclick="showTab('roadmap',document.querySelector('.nav-item'));jumpToLevel(2)">
+      <span class="nav-icon">03</span>
+      <span>Deep Learning</span>
+      <span class="nav-badge" id="nb-2">–</span>
+    </a>
+    <a class="nav-item" onclick="showTab('roadmap',document.querySelector('.nav-item'));jumpToLevel(3)">
+      <span class="nav-icon">04</span>
+      <span>NLP & Transformers</span>
+      <span class="nav-badge" id="nb-3">–</span>
+    </a>
+    <a class="nav-item" onclick="showTab('roadmap',document.querySelector('.nav-item'));jumpToLevel(4)">
+      <span class="nav-icon">05</span>
+      <span>Generative AI</span>
+      <span class="nav-badge" id="nb-4">–</span>
+    </a>
+    <a class="nav-item" onclick="showTab('roadmap',document.querySelector('.nav-item'));jumpToLevel(5)">
+      <span class="nav-icon">06</span>
+      <span>Agentic AI</span>
+      <span class="nav-badge" id="nb-5">–</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-profile">
+    <div class="avatar" id="sb-avatar" onclick="showTab('profile',null)">ML</div>
+    <div class="profile-info">
+      <div class="profile-name" id="sb-name" onclick="showTab('profile',null)">Your Name</div>
+      <div class="profile-role">ML Learner</div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main content -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Roadmap — ML to Agentic AI</div>
+    <div class="topbar-tag" id="topbar-tag">// TRACK EVERYTHING</div>
+  </div>
+
+  <div class="content">
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('roadmap', this)">Roadmap</button>
+      <button class="tab" onclick="showTab('growth', this)">Growth Log</button>
+      <button class="tab" onclick="showTab('habits', this)">Habits</button>
+      <button class="tab" onclick="showTab('platforms', this)">Platforms</button>
+      <button class="tab" onclick="showTab('profile', this)">Profile</button>
+    </div>
+
+    <!-- ROADMAP TAB -->
+    <div class="tab-panel active" id="tab-roadmap">
+      <!-- Overall progress -->
+      <div class="overall-progress">
+        <div class="op-top">
+          <span class="op-label">Overall journey progress</span>
+          <span class="op-pct" id="op-pct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="op-fill" style="width:0%"></div>
+        </div>
+        <div class="level-dots" id="level-dots"></div>
+      </div>
+
+      <!-- Level blocks will be rendered by JS -->
+      <div id="levels-container"></div>
+    </div>
+
+    <!-- GROWTH LOG TAB -->
+    <div class="tab-panel" id="tab-growth">
+      <div class="journal-header">
+        <div class="section-header" style="margin:0">
+          <h2>Growth Log</h2>
+          <span class="sh-count" id="entry-count">0 entries</span>
+        </div>
+        <button class="add-btn" onclick="openModal()">+ New Entry</button>
+      </div>
+      <div id="entries-container">
+        <div class="empty-state">
+          <div class="es-icon">📓</div>
+          <p>No entries yet.<br/>Document your learnings, wins, blockers, and internship moments.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- HABITS TAB -->
+    <div class="tab-panel" id="tab-habits">
+      <div class="section-header">
+        <h2>Weekly Habits</h2>
+        <span class="sh-count">Last 7 days</span>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:28px;">
+        <div style="display:flex;gap:12px;justify-content:flex-end;margin-bottom:12px;">
+          <span style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.1em;">MON TUE WED THU FRI SAT SUN</span>
+        </div>
+        <div id="habits-container"></div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;">
+        <div style="font-family:var(--display);font-size:15px;font-weight:700;margin-bottom:14px;">Habit guide</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.8;">
+          <div>📺 <b style="color:var(--text)">Watch YT</b> — At least 1 focused video/lesson per day</div>
+          <div>⚙ <b style="color:var(--text)">Build code</b> — Write/commit code for your current project</div>
+          <div>📖 <b style="color:var(--text)">Read</b> — One blog post, paper section, or doc page</div>
+          <div>🗃 <b style="color:var(--text)">Kaggle</b> — Check your active notebook or competition</div>
+          <div>✍ <b style="color:var(--text)">Log it</b> — Write a Growth Log entry (keeps memory alive)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLATFORMS TAB -->
+    <div class="tab-panel" id="tab-platforms">
+      <div class="section-header">
+        <h2>Your Platforms</h2>
+        <span class="sh-count">3 core · 1 optional</span>
+      </div>
+      <div class="platform-grid">
+        <a class="platform-card" id="pc-kaggle" onclick="editPlatform('kaggle')" style="cursor:pointer;">
+          <div class="pc-icon">🏆</div>
+          <div class="pc-name">Kaggle</div>
+          <div class="pc-role">Datasets · Notebooks · Competitions<br/><span id="kaggle-link" style="color:var(--accent2);font-size:10px;margin-top:4px;display:block;">Add your profile URL →</span></div>
+        </a>
+        <a class="platform-card" id="pc-github" onclick="editPlatform('github')" style="cursor:pointer;">
+          <div class="pc-icon">🐙</div>
+          <div class="pc-name">GitHub</div>
+          <div class="pc-role">All projects live here<br/><span id="github-link" style="color:var(--accent2);font-size:10px;margin-top:4px;display:block;">Add your profile URL →</span></div>
+        </a>
+        <a class="platform-card" id="pc-hf" onclick="editPlatform('hf')" style="cursor:pointer;">
+          <div class="pc-icon">🤗</div>
+          <div class="pc-name">Hugging Face</div>
+          <div class="pc-role">Models · Spaces · Gen AI demos<br/><span id="hf-link" style="color:var(--accent2);font-size:10px;margin-top:4px;display:block;">Add your profile URL →</span></div>
+        </a>
+        <a class="platform-card" id="pc-linkedin" onclick="editPlatform('linkedin')" style="cursor:pointer;">
+          <div class="pc-icon">💼</div>
+          <div class="pc-name">LinkedIn</div>
+          <div class="pc-role">Share wins, build visibility<br/><span id="linkedin-link" style="color:var(--accent2);font-size:10px;margin-top:4px;display:block;">Add your profile URL →</span></div>
+        </a>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;">
+        <div style="font-family:var(--display);font-size:15px;font-weight:700;margin-bottom:14px;">Reading sources to follow</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;">
+          <div style="padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);">
+            <div style="font-weight:500;margin-bottom:4px;">Andrej Karpathy</div>
+            <div style="font-size:11px;color:var(--muted);">karpathy.github.io · @karpathy on X</div>
+          </div>
+          <div style="padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);">
+            <div style="font-weight:500;margin-bottom:4px;">Chip Huyen</div>
+            <div style="font-size:11px;color:var(--muted);">huyenchip.com · ML systems/production</div>
+          </div>
+          <div style="padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);">
+            <div style="font-weight:500;margin-bottom:4px;">Lilian Weng</div>
+            <div style="font-size:11px;color:var(--muted);">lilianweng.github.io · Research depth</div>
+          </div>
+          <div style="padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);">
+            <div style="font-weight:500;margin-bottom:4px;">r/MachineLearning</div>
+            <div style="font-size:11px;color:var(--muted);">+ r/LocalLLaMA for weekly skim</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE TAB -->
+    <div class="tab-panel" id="tab-profile">
+      <div class="section-header"><h2>Your Profile</h2></div>
+      <div class="profile-edit-section">
+        <div class="profile-avatar-large" id="profile-avatar">ML</div>
+        <div class="profile-form">
+          <div class="profile-field">
+            <label>Full name</label>
+            <input type="text" id="pf-name" placeholder="Your full name"/>
+          </div>
+          <div class="profile-field">
+            <label>Initials (shown in avatar)</label>
+            <input type="text" id="pf-initials" placeholder="e.g. AK" maxlength="2"/>
+          </div>
+          <div class="profile-field">
+            <label>College / Institution</label>
+            <input type="text" id="pf-college" placeholder="e.g. IIT Bombay, BITS Pilani"/>
+          </div>
+          <div class="profile-field">
+            <label>Internship / Current role</label>
+            <input type="text" id="pf-role" placeholder="e.g. Agentic AI Intern @ ___"/>
+          </div>
+          <div class="profile-field">
+            <label>Short bio / goal</label>
+            <input type="text" id="pf-bio" placeholder="e.g. Building from ML fundamentals → Agentic AI"/>
+          </div>
+          <button class="save-profile-btn" onclick="saveProfile()">Save Profile</button>
+        </div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;">
+        <div style="font-family:var(--display);font-size:15px;font-weight:700;margin-bottom:14px;">Journey summary</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;" id="journey-stats"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Entry modal -->
+<div class="modal-overlay" id="entry-modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <h3>New Growth Log Entry</h3>
+    <label>Title</label>
+    <input type="text" id="entry-title-input" placeholder="What did you learn / build today?"/>
+    <label>Body</label>
+    <textarea id="entry-body-input" placeholder="Write freely — learnings, blockers, internship moments, wins..."></textarea>
+    <label>Tags (comma separated)</label>
+    <input type="text" id="entry-tags-input" placeholder="e.g. RAG, LangChain, internship, kaggle"/>
+    <label>Type</label>
+    <select id="entry-type-input">
+      <option value="learning">📚 Learning</option>
+      <option value="build">⚙ Build / Project</option>
+      <option value="internship">🏢 Internship</option>
+      <option value="win">🏆 Win</option>
+      <option value="blocker">🚧 Blocker</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveEntry()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- Platform modal -->
+<div class="modal-overlay" id="platform-modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <h3 id="platform-modal-title">Add Platform URL</h3>
+    <label>Your profile URL</label>
+    <input type="text" id="platform-url-input" placeholder="https://..."/>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closePlatformModal()">Cancel</button>
+      <button class="btn-save" onclick="savePlatformUrl()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ─────────────────────────────────────────────────────────
+const LEVELS = [
+  {
+    id: 0, badge: 'ML', badgeClass: 'badge-ml',
+    name: 'ML Foundations', sub: 'Python · Data · First models',
+    tasks: [
+      { id:'t0_0', type:'yt', label:'StatQuest — ML Fundamentals series', detail:'Linear Regression → Logistic → Decision Trees → Random Forests. Start here, no skipping.', domain:'Foundation' },
+      { id:'t0_1', type:'yt', label:'Krish Naik — Python for ML', detail:'NumPy, Pandas, Matplotlib, Seaborn. Your daily tools forever.', domain:'Foundation' },
+      { id:'t0_2', type:'build', label:'Kaggle: Heart Disease UCI → predict yes/no', detail:'EDA → cleaning → feature selection → train/test split → Logistic + Random Forest', domain:'Medical 🩺' },
+      { id:'t0_3', type:'concept', label:'When to use accuracy vs precision vs recall vs F1', detail:'Accuracy: balanced classes. Precision: minimize FP. Recall: minimize FN. F1: imbalanced data.', domain:'Concept' },
+      { id:'t0_4', type:'concept', label:'Overfitting, underfitting, regularization (L1/L2)', detail:'Ridge (L2), Lasso (L1), ElasticNet. Why train/val/test — never touch test until the end.', domain:'Concept' },
+      { id:'t0_5', type:'read', label:'Google ML Crash Course — "Framing" + "Descending into ML"', detail:'Free. Dense but short. Read once, bookmark forever.', domain:'Reading' },
+    ]
+  },
+  {
+    id: 1, badge: 'ML', badgeClass: 'badge-ml',
+    name: 'Core ML Algorithms', sub: 'Supervised · Unsupervised · Evaluation',
+    tasks: [
+      { id:'t1_0', type:'yt', label:'StatQuest — SVMs, K-Means, PCA, Naive Bayes, XGBoost', detail:'Watch in this order. Each one builds on the last.', domain:'Foundation' },
+      { id:'t1_1', type:'yt', label:'Sentdex — Scikit-learn practical series', detail:'Hands-on Python for every algorithm. Code-first learning.', domain:'Foundation' },
+      { id:'t1_2', type:'build', label:'Kaggle: Credit Card Fraud Detection', detail:'XGBoost + SMOTE. Cross-validation, ROC-AUC, confusion matrix. Streamlit deploy.', domain:'Fintech 💰' },
+      { id:'t1_3', type:'concept', label:'Algorithm selection map', detail:'Trees (tabular/interpretable), SVM (high-dim/small data), KMeans (segmentation), PCA (dim reduction)', domain:'Concept' },
+      { id:'t1_4', type:'concept', label:'Cross-validation + GridSearchCV hyperparameter tuning', detail:'k-fold CV, RandomizedSearchCV. Why one train/test split isn\'t enough.', domain:'Concept' },
+      { id:'t1_5', type:'read', label:'"A Few Useful Things to Know About ML" — Pedro Domingos', detail:'Free 8-page paper. One of the most referenced ML intuition reads. Go slow.', domain:'Reading' },
+    ]
+  },
+  {
+    id: 2, badge: 'DL', badgeClass: 'badge-dl',
+    name: 'Neural Networks & Deep Learning', sub: 'Backprop · CNNs · RNNs · PyTorch',
+    tasks: [
+      { id:'t2_0', type:'yt', label:'3Blue1Brown — "Neural Networks" series (4 videos)', detail:'No code. Pure visual intuition for backprop and gradient descent. Non-negotiable first step.', domain:'Foundation' },
+      { id:'t2_1', type:'yt', label:'Andrej Karpathy — "Neural Networks: Zero to Hero"', detail:'Build a neural net from scratch → then build a GPT from scratch. Best DL course online.', domain:'Foundation' },
+      { id:'t2_2', type:'build', label:'Amazon Reviews: Product recommendation (neural collab filtering)', detail:'PyTorch. User → recommended products. README with architecture diagram.', domain:'Ecommerce 🛒' },
+      { id:'t2_3', type:'build', label:'Product image classifier CNN (clothing/electronics/books)', detail:'Transfer learning — don\'t train from scratch. Fine-tune a pretrained model.', domain:'Ecommerce 🛒' },
+      { id:'t2_4', type:'concept', label:'Transfer learning — fine-tune, don\'t train from scratch', detail:'90% of real-world DL. Pretrained weights + your domain data.', domain:'Concept' },
+      { id:'t2_5', type:'concept', label:'BatchNorm, Dropout, LR scheduling — why training converges', detail:'These are what separate a model that trains from one that doesn\'t.', domain:'Concept' },
+      { id:'t2_6', type:'read', label:'fast.ai — Practical Deep Learning Ch. 1 & 2 only', detail:'How a practitioner thinks before touching code. Opinionated and practical.', domain:'Reading' },
+    ]
+  },
+  {
+    id: 3, badge: 'NLP', badgeClass: 'badge-dl',
+    name: 'NLP & Transformers', sub: 'Attention · BERT · Fine-tuning · HuggingFace',
+    tasks: [
+      { id:'t3_0', type:'yt', label:'Karpathy — "Let\'s build GPT" (2hr capstone)', detail:'Build a transformer from scratch. You will understand attention after this. Not before.', domain:'Foundation' },
+      { id:'t3_1', type:'yt', label:'HuggingFace NLP Course (huggingface.co/learn)', detail:'Tokenizers, BERT, fine-tuning on your own data. Free and excellent.', domain:'Foundation' },
+      { id:'t3_2', type:'build', label:'Sentiment + toxicity detection — fine-tune DistilBERT', detail:'Twitter Sentiment or Jigsaw Toxicity dataset. Deploy as HuggingFace Space (Gradio). Public URL = portfolio.', domain:'Social Media 📱' },
+      { id:'t3_3', type:'concept', label:'Self-attention, multi-head attention, positional encoding', detail:'Not as formulas — as intuitions. Why position must be injected.', domain:'Concept' },
+      { id:'t3_4', type:'concept', label:'Fine-tuning vs prompting vs training from scratch — when each', detail:'Fine-tune: domain adaptation. Prompt: general tasks. Train: you have millions of samples.', domain:'Concept' },
+      { id:'t3_5', type:'read', label:'"Attention Is All You Need" — abstract + architecture section', detail:'Original transformer paper (2017). Recognize what you built in Karpathy\'s video in its figures.', domain:'Reading' },
+    ]
+  },
+  {
+    id: 4, badge: 'GEN AI', badgeClass: 'badge-genai',
+    name: 'Generative AI', sub: 'LLMs · RAG · Embeddings · Prompt Engineering',
+    tasks: [
+      { id:'t4_0', type:'yt', label:'Karpathy — "Intro to Large Language Models" (1hr talk)', detail:'Best single video on what an LLM is, how it\'s trained, what it can\'t do. Watch before building anything Gen AI.', domain:'Foundation' },
+      { id:'t4_1', type:'yt', label:'Sam Witteveen / Matt Williams — RAG from scratch (LangChain)', detail:'Search "RAG from scratch LangChain" on YT. Very hands-on vector DB + retrieval walkthroughs.', domain:'Foundation' },
+      { id:'t4_2', type:'build', label:'Medical RAG: Q&A over research papers (arXiv/PubMed)', detail:'LangChain + ChromaDB + Groq/OpenAI. User asks clinical question → retrieve → LLM synthesizes. Deploy on HF Spaces.', domain:'Medical 🩺' },
+      { id:'t4_3', type:'concept', label:'Embeddings = compressed meaning, not just word vectors', detail:'The core primitive of everything Gen AI. Similarity search, semantic retrieval.', domain:'Concept' },
+      { id:'t4_4', type:'concept', label:'RAG vs fine-tuning — when to use each', detail:'RAG: dynamic/external knowledge. Fine-tuning: style/domain adaptation. Hallucination is a retrieval+prompting problem.', domain:'Concept' },
+      { id:'t4_5', type:'read', label:'Lilian Weng — "LLM-powered Autonomous Agents"', detail:'lilianweng.github.io. Long post — read in sections. Maps directly to your internship.', domain:'Reading' },
+    ]
+  },
+  {
+    id: 5, badge: 'AGENTIC', badgeClass: 'badge-agentic',
+    name: 'Agentic AI', sub: 'Tool Use · Multi-Agent · Evals · Production',
+    tasks: [
+      { id:'t5_0', type:'yt', label:'Andrew Ng — Agentic AI (DeepLearning.ai free short courses)', detail:'"AI Agents in LangGraph", "Building Agentic RAG". 1-2 hour focused courses, free.', domain:'Foundation' },
+      { id:'t5_1', type:'yt', label:'LangChain / LangGraph official YT — multi-agent tutorials', detail:'Search "LangGraph multi-agent". Code-heavy, direct.', domain:'Foundation' },
+      { id:'t5_2', type:'build', label:'Multi-agent: news fetch → sentiment → report writer', detail:'Agent 1: web search. Agent 2: your Level 4 sentiment model. Agent 3: summary. LangGraph orchestration.', domain:'Fintech 💰 + Ecommerce 🛒' },
+      { id:'t5_3', type:'build', label:'Add evals harness to your agent', detail:'Test whether outputs are accurate/grounded. This separates student project from production ML work.', domain:'Production' },
+      { id:'t5_4', type:'concept', label:'Tool calling, ReAct pattern, memory types', detail:'Short-term (context), long-term (DB), episodic (history). How an LLM takes real actions.', domain:'Concept' },
+      { id:'t5_5', type:'concept', label:'Evals: without eval, you don\'t know if your agent works', detail:'Hardest + most underrated skill in ML. Build eval before you build features.', domain:'Concept' },
+      { id:'t5_6', type:'read', label:'Anthropic — "Building Effective Agents" (anthropic.com)', detail:'Short, practical, from people who build these in production. Required for your internship context.', domain:'Reading' },
+    ]
+  }
+];
+
+const HABITS = [
+  { id: 'h_yt',    name: '📺 Watch YT lesson' },
+  { id: 'h_code',  name: '⚙ Write / commit code' },
+  { id: 'h_read',  name: '📖 Read blog / paper' },
+  { id: 'h_kaggle',name: '🗃 Kaggle activity' },
+  { id: 'h_log',   name: '✍ Write Growth Log entry' },
+];
+
+// ─── STORAGE ──────────────────────────────────────────────────────
+function ls(key, def) {
+  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : def; } catch { return def; }
+}
+function lss(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
+
+let checked = ls('ml_checked', {});
+let entries = ls('ml_entries', []);
+let habitData = ls('ml_habits', {});
+let platforms = ls('ml_platforms', { kaggle:'', github:'', hf:'', linkedin:'' });
+let profile = ls('ml_profile', { name:'Your Name', initials:'ML', college:'', role:'ML Learner', bio:'' });
+
+// ─── RENDER ───────────────────────────────────────────────────────
+function typeLabel(t) {
+  const m = { yt:'YT VIDEO', build:'BUILD', read:'READ', concept:'CONCEPT' };
+  const c = { yt:'type-yt', build:'type-build', read:'type-read', concept:'type-concept' };
+  return `<span class="task-type ${c[t]||'type-concept'}">${m[t]||t.toUpperCase()}</span>`;
+}
+
+function renderLevels() {
+  const c = document.getElementById('levels-container');
+  c.innerHTML = '';
+  const dots = document.getElementById('level-dots');
+  dots.innerHTML = '';
+
+  let totalDone = 0, totalAll = 0;
+
+  LEVELS.forEach((lv, li) => {
+    const lvDone = lv.tasks.filter(t => checked[t.id]).length;
+    const lvAll = lv.tasks.length;
+    totalDone += lvDone;
+    totalAll += lvAll;
+    const pct = lvAll ? Math.round(lvDone / lvAll * 100) : 0;
+
+    // nav badge
+    const nb = document.getElementById('nb-' + li);
+    if (nb) nb.textContent = lvDone + '/' + lvAll;
+
+    // level dot
+    const dot = document.createElement('span');
+    dot.className = 'level-dot' + (pct === 100 ? ' done' : (lvDone > 0 ? ' current' : ''));
+    dot.textContent = 'L' + (li+1) + (pct > 0 ? ' ' + pct + '%' : '');
+    dots.appendChild(dot);
+
+    // build block
+    const block = document.createElement('div');
+    block.className = 'level-block' + (pct === 100 ? ' done-block' : '');
+    block.id = 'level-' + li;
+
+    block.innerHTML = `
+      <div class="level-title-row" onclick="toggleLevel(${li}, this)">
+        <span class="level-num">0${li+1}</span>
+        <span class="level-badge ${lv.badgeClass}">${lv.badge}</span>
+        <div>
+          <div class="level-name">${lv.name}</div>
+          <div class="level-sub-name">${lv.sub}</div>
+        </div>
+        <div class="level-prog">
+          <span class="level-prog-text">${lvDone}/${lvAll}</span>
+          <div class="mini-bar"><div class="mini-fill" style="width:${pct}%"></div></div>
+        </div>
+        <span class="chevron-icon">▶</span>
+      </div>
+      <div class="level-body" id="lb-${li}">
+        <table class="task-table">
+          <thead>
+            <tr>
+              <th style="width:32px">✓</th>
+              <th>Type</th>
+              <th>Task</th>
+              <th>Domain</th>
+              <th>Notes / Detail</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${lv.tasks.map(t => `
+              <tr class="${checked[t.id] ? 'done-row' : ''}" id="row-${t.id}">
+                <td><div class="task-check ${checked[t.id] ? 'checked' : ''}" onclick="toggleTask('${t.id}', ${li})"></div></td>
+                <td>${typeLabel(t.type)}</td>
+                <td style="font-weight:500;max-width:280px">${t.label}</td>
+                <td><span class="task-domain">${t.domain}</span></td>
+                <td class="note-cell" style="max-width:220px">${t.detail}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+    c.appendChild(block);
+  });
+
+  // overall
+  const pct = totalAll ? Math.round(totalDone / totalAll * 100) : 0;
+  document.getElementById('op-pct').textContent = pct + '%';
+  document.getElementById('op-fill').style.width = pct + '%';
+  document.getElementById('sb-done').textContent = totalDone;
+  document.getElementById('sb-total').textContent = totalAll;
+  document.getElementById('sb-pct').textContent = pct + '%';
+}
+
+function toggleTask(id, li) {
+  checked[id] = !checked[id];
+  lss('ml_checked', checked);
+  // update row
+  const row = document.getElementById('row-' + id);
+  if (row) row.className = checked[id] ? 'done-row' : '';
+  const box = row ? row.querySelector('.task-check') : null;
+  if (box) box.className = 'task-check' + (checked[id] ? ' checked' : '');
+  // recalc progress for this level
+  const lv = LEVELS[li];
+  const lvDone = lv.tasks.filter(t => checked[t.id]).length;
+  const lvAll = lv.tasks.length;
+  const pct = Math.round(lvDone / lvAll * 100);
+  const block = document.getElementById('level-' + li);
+  if (block) {
+    block.className = 'level-block' + (pct === 100 ? ' done-block' : '');
+    const miniFill = block.querySelector('.mini-fill');
+    if (miniFill) miniFill.style.width = pct + '%';
+    const progText = block.querySelector('.level-prog-text');
+    if (progText) progText.textContent = lvDone + '/' + lvAll;
+    const nb = document.getElementById('nb-' + li);
+    if (nb) nb.textContent = lvDone + '/' + lvAll;
+  }
+  // overall
+  let td = 0, ta = 0;
+  LEVELS.forEach(l => { td += l.tasks.filter(t => checked[t.id]).length; ta += l.tasks.length; });
+  const op = Math.round(td/ta*100);
+  document.getElementById('op-pct').textContent = op + '%';
+  document.getElementById('op-fill').style.width = op + '%';
+  document.getElementById('sb-done').textContent = td;
+  document.getElementById('sb-pct').textContent = op + '%';
+  // dots
+  renderDots();
+}
+
+function renderDots() {
+  const dots = document.getElementById('level-dots');
+  if (!dots) return;
+  dots.innerHTML = '';
+  LEVELS.forEach((lv, li) => {
+    const lvDone = lv.tasks.filter(t => checked[t.id]).length;
+    const pct = Math.round(lvDone / lv.tasks.length * 100);
+    const dot = document.createElement('span');
+    dot.className = 'level-dot' + (pct === 100 ? ' done' : (lvDone > 0 ? ' current' : ''));
+    dot.textContent = 'L' + (li+1) + (pct > 0 ? ' ' + pct + '%' : '');
+    dots.appendChild(dot);
+  });
+}
+
+function toggleLevel(li, hdr) {
+  const body = document.getElementById('lb-' + li);
+  const chev = hdr.querySelector('.chevron-icon');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  hdr.classList.toggle('open', !isOpen);
+  if (chev) chev.classList.toggle('open', !isOpen);
+}
+
+function jumpToLevel(li) {
+  const el = document.getElementById('level-' + li);
+  if (el) { el.scrollIntoView({ behavior:'smooth', block:'start' }); }
+  const body = document.getElementById('lb-' + li);
+  const hdr = el ? el.querySelector('.level-title-row') : null;
+  if (body && !body.classList.contains('open')) {
+    body.classList.add('open');
+    if (hdr) hdr.classList.add('open');
+    const chev = hdr ? hdr.querySelector('.chevron-icon') : null;
+    if (chev) chev.classList.add('open');
+  }
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────
+const tabTitles = {
+  roadmap: ['Roadmap — ML to Agentic AI', '// TRACK EVERYTHING'],
+  growth: ['Growth Log', '// YOUR LEARNING HISTORY'],
+  habits: ['Daily Habits', '// CONSISTENCY COMPOUNDS'],
+  platforms: ['Platforms & Reading', '// YOUR DIGITAL PRESENCE'],
+  profile: ['Profile', '// YOUR GROWTH STORY'],
+};
+function showTab(name, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const panel = document.getElementById('tab-' + name);
+  if (panel) panel.classList.add('active');
+  if (el && el.classList) {
+    if (el.classList.contains('tab')) el.classList.add('active');
+    if (el.classList.contains('nav-item')) el.classList.add('active');
+  }
+  const titles = tabTitles[name] || [name, ''];
+  document.getElementById('topbar-title').textContent = titles[0];
+  document.getElementById('topbar-tag').textContent = titles[1];
+}
+
+// ─── ENTRIES ──────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('entry-modal').classList.add('open');
+  document.getElementById('entry-title-input').focus();
+}
+function closeModal() { document.getElementById('entry-modal').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target === e.currentTarget) closeModal(); }
+
+const typeEmoji = { learning:'📚', build:'⚙', internship:'🏢', win:'🏆', blocker:'🚧' };
+
+function saveEntry() {
+  const title = document.getElementById('entry-title-input').value.trim();
+  const body = document.getElementById('entry-body-input').value.trim();
+  const tags = document.getElementById('entry-tags-input').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const type = document.getElementById('entry-type-input').value;
+  if (!title) return;
+  const entry = {
+    id: Date.now(),
+    title, body, tags, type,
+    date: new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
+  };
+  entries.unshift(entry);
+  lss('ml_entries', entries);
+  document.getElementById('entry-title-input').value = '';
+  document.getElementById('entry-body-input').value = '';
+  document.getElementById('entry-tags-input').value = '';
+  closeModal();
+  renderEntries();
+}
+
+function deleteEntry(id) {
+  entries = entries.filter(e => e.id !== id);
+  lss('ml_entries', entries);
+  renderEntries();
+}
+
+function renderEntries() {
+  const c = document.getElementById('entries-container');
+  const cnt = document.getElementById('entry-count');
+  cnt.textContent = entries.length + (entries.length === 1 ? ' entry' : ' entries');
+  if (!entries.length) {
+    c.innerHTML = `<div class="empty-state"><div class="es-icon">📓</div><p>No entries yet.<br/>Document your learnings, wins, blockers, and internship moments.</p></div>`;
+    return;
+  }
+  c.innerHTML = entries.map(e => `
+    <div class="entry-card">
+      <button class="entry-del" onclick="deleteEntry(${e.id})">✕</button>
+      <div class="entry-top">
+        <div class="entry-date">${e.date}</div>
+        <div class="entry-title">${typeEmoji[e.type]||'📌'} ${e.title}</div>
+      </div>
+      ${e.body ? `<div class="entry-body">${e.body.replace(/\n/g,'<br/>')}</div>` : ''}
+      <div class="entry-tags">
+        <span class="entry-tag">${e.type.toUpperCase()}</span>
+        ${e.tags.map(t => `<span class="entry-tag">${t}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── HABITS ───────────────────────────────────────────────────────
+function renderHabits() {
+  const c = document.getElementById('habits-container');
+  c.innerHTML = HABITS.map(h => {
+    const days = ['mon','tue','wed','thu','fri','sat','sun'];
+    const today = new Date();
+    const weekKey = getWeekKey();
+    return `
+      <div class="habit-row">
+        <div class="habit-name">${h.name}</div>
+        <div class="habit-streak" id="streak-${h.id}">–</div>
+        <div class="habit-dots">
+          ${days.map((d,i) => {
+            const key = weekKey + '_' + h.id + '_' + d;
+            const hit = habitData[key];
+            return `<div class="habit-dot ${hit ? 'hit' : ''}" onclick="toggleHabit('${h.id}','${d}','${weekKey}')" title="${d}"></div>`;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+  updateStreaks();
+}
+
+function getWeekKey() {
+  const d = new Date();
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const mon = new Date(d.setDate(diff));
+  return mon.toISOString().slice(0,10);
+}
+
+function toggleHabit(hid, day, wk) {
+  const key = wk + '_' + hid + '_' + day;
+  habitData[key] = !habitData[key];
+  lss('ml_habits', habitData);
+  renderHabits();
+}
+
+function updateStreaks() {
+  HABITS.forEach(h => {
+    const el = document.getElementById('streak-' + h.id);
+    if (!el) return;
+    const days = ['mon','tue','wed','thu','fri','sat','sun'];
+    const wk = getWeekKey();
+    const count = days.filter(d => habitData[wk + '_' + h.id + '_' + d]).length;
+    el.textContent = count > 0 ? count + '/7 🔥' : '0/7';
+  });
+}
+
+// ─── PLATFORMS ────────────────────────────────────────────────────
+let editingPlatform = null;
+function editPlatform(name) {
+  editingPlatform = name;
+  const names = { kaggle:'Kaggle', github:'GitHub', hf:'Hugging Face', linkedin:'LinkedIn' };
+  document.getElementById('platform-modal-title').textContent = 'Add ' + names[name] + ' URL';
+  document.getElementById('platform-url-input').value = platforms[name] || '';
+  document.getElementById('platform-modal').classList.add('open');
+}
+function closePlatformModal() {
+  document.getElementById('platform-modal').classList.remove('open');
+  editingPlatform = null;
+}
+function savePlatformUrl() {
+  if (!editingPlatform) return;
+  platforms[editingPlatform] = document.getElementById('platform-url-input').value.trim();
+  lss('ml_platforms', platforms);
+  renderPlatforms();
+  closePlatformModal();
+}
+function renderPlatforms() {
+  const map = { kaggle:'kaggle-link', github:'github-link', hf:'hf-link', linkedin:'linkedin-link' };
+  Object.entries(map).forEach(([k, elId]) => {
+    const el = document.getElementById(elId);
+    if (el) {
+      if (platforms[k]) {
+        el.textContent = '→ ' + platforms[k].replace('https://', '').substring(0,40);
+        el.style.color = 'var(--green)';
+      } else {
+        el.textContent = 'Add your profile URL →';
+        el.style.color = 'var(--accent2)';
+      }
+    }
+    // make card a real link if URL exists
+    const card = document.getElementById('pc-' + k);
+    if (card && platforms[k]) {
+      card.onclick = (e) => { e.preventDefault(); window.open(platforms[k], '_blank'); };
+    }
+  });
+}
+
+// ─── PROFILE ──────────────────────────────────────────────────────
+function loadProfile() {
+  document.getElementById('pf-name').value = profile.name || '';
+  document.getElementById('pf-initials').value = profile.initials || '';
+  document.getElementById('pf-college').value = profile.college || '';
+  document.getElementById('pf-role').value = profile.role || '';
+  document.getElementById('pf-bio').value = profile.bio || '';
+  updateProfileUI();
+}
+
+function updateProfileUI() {
+  const initials = profile.initials || 'ML';
+  ['sb-avatar', 'profile-avatar'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = initials.toUpperCase();
+  });
+  const nameEl = document.getElementById('sb-name');
+  if (nameEl) nameEl.textContent = profile.name || 'Your Name';
+  renderJourneyStats();
+}
+
+function saveProfile() {
+  profile.name = document.getElementById('pf-name').value.trim() || 'Your Name';
+  profile.initials = (document.getElementById('pf-initials').value.trim() || 'ML').substring(0,2).toUpperCase();
+  profile.college = document.getElementById('pf-college').value.trim();
+  profile.role = document.getElementById('pf-role').value.trim();
+  profile.bio = document.getElementById('pf-bio').value.trim();
+  lss('ml_profile', profile);
+  updateProfileUI();
+}
+
+function renderJourneyStats() {
+  const c = document.getElementById('journey-stats');
+  if (!c) return;
+  let td = 0, ta = 0;
+  LEVELS.forEach(l => { td += l.tasks.filter(t => checked[t.id]).length; ta += l.tasks.length; });
+  const completedLevels = LEVELS.filter(l => l.tasks.every(t => checked[t.id])).length;
+  const stats = [
+    { n: td, l: 'Tasks done' },
+    { n: ta - td, l: 'Remaining' },
+    { n: completedLevels, l: 'Levels done' },
+    { n: entries.length, l: 'Log entries' },
+  ];
+  c.innerHTML = stats.map(s => `
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent2)">${s.n}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">${s.l}</div>
+    </div>
+  `).join('');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────
+renderLevels();
+renderEntries();
+renderHabits();
+renderPlatforms();
+loadProfile();
+
+// re-render journey stats when switching to profile tab
+document.querySelectorAll('.tab, .nav-item').forEach(el => {
+  el.addEventListener('click', () => setTimeout(renderJourneyStats, 50));
+});
+</script>
+</body>
+</html>
